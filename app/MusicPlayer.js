@@ -5,7 +5,6 @@ var listeMorceaux = [];
 for(var i=0;i < playlist.length ;i++){
     for(var j=0;j < playlist[i].albums.length ;j++){
         for(var k=0;k < playlist[i].albums[j].songs.length ;k++){
-        console.log("i = " + i + "j = " + j + " k " + k);
             var titre=playlist[i].albums[j].songs[k].title;
             var duree=playlist[i].albums[j].songs[k].length;
             var nomPlaylist=playlist[i].name;
@@ -58,11 +57,9 @@ var e = MusicPlayer.events = {
     loadPlayList: 'loadPlayList',
     stop: 'stop'
 };
-var test = [{"title": "lalal", "length": "lalal", "nomAlbum": "lalal", "nomPlaylist": "lalal"},
-    {"title": "hahahahah", "length": "hahahahah", "nomAlbum": "hahahahah", "nomPlaylist": "hahahahah"}
-];
+
 var musicPlayer = new MusicPlayer();
 
-musicPlayer.loadPlayList(test);
+musicPlayer.loadPlayList(listeMorceaux);
 
 module.exports = MusicPlayer;
