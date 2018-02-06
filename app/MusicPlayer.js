@@ -1,51 +1,68 @@
 var util = require('util');
 var events = require('events');
+var playlist = require("../playlists/index");
+var listeMorceaux = [];
+for(var i=0;i < playlist.length ;i++){
+    for(var j=0;j < playlist[i].albums.length ;j++){
+        for(var k=0;k < playlist[i].albums[j].songs.length ;k++){
+        console.log("i = " + i + "j = " + j + " k " + k);
+            var titre=playlist[i].albums[j].songs[k].title;
+            var duree=playlist[i].albums[j].songs[k].length;
+            var nomPlaylist=playlist[i].name;
+            var nomAlbum=playlist[i].albums[j].title;
+            var morceau= {};
+            morceau= {"title": titre, "length": duree, "nomAlbum": nomAlbum, "nomPlaylist": nomPlaylist};
+            listeMorceaux.push(morceau);
+        }
+    }
+}
 
 function MusicPlayer() {
-    this.playList = false;
-    this.nowPlaying = false;
-    this.pauseStatus = false;
-    this.stopped = false;
+    this.num = 0;
 
     events.EventEmitter.call(this);
-    this.on(MusicPlayer.events.play, this.play.bind(this));
     this.on(MusicPlayer.events.loadPlayList, this.loadPlayList.bind(this));
-    this.on(MusicPlayer.events.pause, this.pause.bind(this));
-    this.on(MusicPlayer.events.stop, this.stop.bind(this));
-}
+    this.on(MusicPlayer.events.play, this.play.bind(this));
+};
+
 util.inherits(MusicPlayer, events.EventEmitter);
 
+MusicPlayer.prototype.loadPlayList= function(liste) {
+    this.laliste = liste;
+    this.play();
+};
 
 MusicPlayer.prototype.play = function() {
-    this.playing = nowPlaying;
-};
-MusicPlayer.prototype.loadPlayList= function() {
-    this.PlayList = playList;
-};
-MusicPlayer.prototype.pause= function() {
-    this.pauseStatus = Pause;
+
+
+    if(this.num==this.laliste.length){
+        this.emit(e.stop);
+    }else{
+        console.log("chanson numero : " + this.num);
+        console.log("---------------------");
+        console.log("Nom de la Playlist : " + this.laliste[this.num].nomPlaylist);
+        console.log("Nom D'album : " + this.laliste[this.num].nomAlbum);
+        console.log("Titre de chanson : " + this.laliste[this.num].title);
+        console.log("durée de chanson : " + this.laliste[this.num].length);
+        console.log("---------------------");
+        this.num++;
+        this.emit(e.loadPlayList,this.laliste);
+    }
 };
 MusicPlayer.prototype.stop= function() {
-    this.stopped = stopStat;
+    console.log("Playlist terminée");
+    process.exit(0);
 };
 var e = MusicPlayer.events = {
     play: 'play',
     loadPlayList: 'loadPlayList',
-    pause: 'pause',
     stop: 'stop'
 };
+var test = [{"title": "lalal", "length": "lalal", "nomAlbum": "lalal", "nomPlaylist": "lalal"},
+    {"title": "hahahahah", "length": "hahahahah", "nomAlbum": "hahahahah", "nomPlaylist": "hahahahah"}
+];
 var musicPlayer = new MusicPlayer();
 
-musicPlayer.on(e.play, function() {
-    this.nowPlaying = true;
-});
-musicPlayer.on(e.loadPlayList, function() {
-    this.playList = true;
-});
-musicPlayer.on(e.pause, function() {
-    this.pauseStatus = true;
-});
-musicPlayer.on(e.stop, function() {
-    this.stopped = true;
-});
+musicPlayer.loadPlayList(test);
+
 module.exports = MusicPlayer;
