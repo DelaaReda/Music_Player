@@ -23,4 +23,10 @@ describe("Music player", function () {
             expect(new MusicPlayer().loadPlayList).not.to.be.undefined;
         });
     });
+    describe("Music player functionnality play", function () {
+        it("should be defined", function () {
+            expect(new MusicPlayer().play).not.to.be.undefined;
+        });
+    });
 });
+
