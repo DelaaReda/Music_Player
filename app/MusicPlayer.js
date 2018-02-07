@@ -6,12 +6,12 @@ function MusicPlayer() {
     this.num = 0;
     this.listeMorceaux = [];
     events.EventEmitter.call(this);
-    this.on(MusicPlayer.events.GetSongsById, this.GetSongsById.bind(this));
-    this.on(MusicPlayer.events.loadPlayList, this.loadPlayList.bind(this));
-    this.on('play', this.play.bind(this));
-    this.on('TV', this.TV.bind(this));
+    this.on(e.GetSongsById, this.GetSongsById.bind(this));
+    this.on(e.loadPlayList, this.loadPlayList.bind(this));
+    this.on(e.play, this.play.bind(this));
+    this.on(e.TV, this.TV.bind(this));
 };
-MusicPlayer.prototype.GetSongsById= function() {
+MusicPlayer.prototype.GetSongsById= function(playlist) {
     // Transformation de la playlist pour tirer les morceaux
     for(var i=0;i < playlist.length ;i++){
         for(var j=0;j < playlist[i].albums.length ;j++){
@@ -32,7 +32,7 @@ util.inherits(MusicPlayer, events.EventEmitter);
 
 MusicPlayer.prototype.loadPlayList= function() {
     this.laliste = this.listeMorceaux;
-    this.emit('play');
+    this.emit(e.play);
 };
 MusicPlayer.prototype.TV= function() {
     var ecranA =  "chanson numero : " + this.num;
@@ -61,12 +61,7 @@ var e = MusicPlayer.events = {
     play: 'play',
     loadPlayList: 'loadPlayList',
     TV: 'TV',
+    GetSongsById: 'GetSongsById'
 };
-
-var musicPlayer = new MusicPlayer();
-var playlist = require("../playlists/index");
-musicPlayer.GetSongsById(playlist);
-musicPlayer.loadPlayList();
-musicPlayer.play();
 
 module.exports = MusicPlayer;
