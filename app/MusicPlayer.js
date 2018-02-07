@@ -1,65 +1,72 @@
 var util = require('util');
 var events = require('events');
-var playlist = require("../playlists/index");
-var listeMorceaux = [];
-for(var i=0;i < playlist.length ;i++){
-    for(var j=0;j < playlist[i].albums.length ;j++){
-        for(var k=0;k < playlist[i].albums[j].songs.length ;k++){
-            var titre=playlist[i].albums[j].songs[k].title;
-            var duree=playlist[i].albums[j].songs[k].length;
-            var nomPlaylist=playlist[i].name;
-            var nomAlbum=playlist[i].albums[j].title;
-            var morceau= {};
-            morceau= {"title": titre, "length": duree, "nomAlbum": nomAlbum, "nomPlaylist": nomPlaylist};
-            listeMorceaux.push(morceau);
-        }
-    }
-}
 
 function MusicPlayer() {
+    this.Afficheur="";
     this.num = 0;
-
+    this.listeMorceaux = [];
     events.EventEmitter.call(this);
+    this.on(MusicPlayer.events.GetSongsById, this.GetSongsById.bind(this));
     this.on(MusicPlayer.events.loadPlayList, this.loadPlayList.bind(this));
-    this.on(MusicPlayer.events.play, this.play.bind(this));
+    this.on('play', this.play.bind(this));
+    this.on('TV', this.TV.bind(this));
 };
-
+MusicPlayer.prototype.GetSongsById= function() {
+    // Transformation de la playlist pour tirer les morceaux
+    for(var i=0;i < playlist.length ;i++){
+        for(var j=0;j < playlist[i].albums.length ;j++){
+            for(var k=0;k < playlist[i].albums[j].songs.length ;k++){
+                var titre=playlist[i].albums[j].songs[k].title;
+                var duree=playlist[i].albums[j].songs[k].length;
+                var nomPlaylist=playlist[i].name;
+                var nomAlbum=playlist[i].albums[j].title;
+                var morceau= {};
+                morceau= {"title": titre, "length": duree, "nomAlbum": nomAlbum, "nomPlaylist": nomPlaylist};
+                this.listeMorceaux.push(morceau);
+            }
+        }
+    }
+};
 util.inherits(MusicPlayer, events.EventEmitter);
 
-MusicPlayer.prototype.loadPlayList= function(liste) {
-    this.laliste = liste;
-    this.play();
+
+MusicPlayer.prototype.loadPlayList= function() {
+    this.laliste = this.listeMorceaux;
+    this.emit('play');
+};
+MusicPlayer.prototype.TV= function() {
+    var ecranA =  "chanson numero : " + this.num;
+    var ecranB =  "\n---------------------\n";
+    var ecranC = "Nom de la Playlist : " + this.laliste[this.num].nomPlaylist;
+    var ecranD = "\nNom D'album : " + this.laliste[this.num].nomAlbum;
+    var ecranE = "\nTitre de chanson : " + this.laliste[this.num].title;
+    var ecranF = "\ndurée de chanson : " + this.laliste[this.num].length;
+    var ecranG = "\n---------------------";
+    this.Afficheur = ecranA + ecranB + ecranC + ecranD + ecranE + ecranF + ecranG;
+    console.log(this.Afficheur);
 };
 
 MusicPlayer.prototype.play = function() {
 
-
     if(this.num==this.laliste.length){
-        this.emit(e.stop);
+        console.log("Playlist terminée");
+        process.exit(0);
     }else{
-        console.log("chanson numero : " + this.num);
-        console.log("---------------------");
-        console.log("Nom de la Playlist : " + this.laliste[this.num].nomPlaylist);
-        console.log("Nom D'album : " + this.laliste[this.num].nomAlbum);
-        console.log("Titre de chanson : " + this.laliste[this.num].title);
-        console.log("durée de chanson : " + this.laliste[this.num].length);
-        console.log("---------------------");
+        this.emit(e.TV);
         this.num++;
         this.emit(e.loadPlayList,this.laliste);
     }
 };
-MusicPlayer.prototype.stop= function() {
-    console.log("Playlist terminée");
-    process.exit(0);
-};
 var e = MusicPlayer.events = {
     play: 'play',
     loadPlayList: 'loadPlayList',
-    stop: 'stop'
+    TV: 'TV',
 };
 
 var musicPlayer = new MusicPlayer();
-
-musicPlayer.loadPlayList(listeMorceaux);
+var playlist = require("../playlists/index");
+musicPlayer.GetSongsById(playlist);
+musicPlayer.loadPlayList();
+musicPlayer.play();
 
 module.exports = MusicPlayer;
